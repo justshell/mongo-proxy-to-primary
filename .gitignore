@@ -1,0 +1,34 @@
+.DS_Store
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+eggs/
+.eggs/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Common backup files
+*.swp
+*.bak
+*.tmp
+*~
+
+# IDEs
+.idea/
+.vscode/
+.gitlab-ci.yml
+.editorconfig
