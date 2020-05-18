@@ -1,6 +1,6 @@
 # Mongo Proxy To Primary
 
-Server that proxies all requests to primary member in the MongoDB replica set. Developed for using inside kubernetes cluster.
+Server that proxies all requests to primary member in the MongoDB replica set.
 
 ## Building and running
 
