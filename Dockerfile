@@ -1,8 +1,10 @@
-FROM python:3.8.3-alpine3.11
+FROM python:3.8.12-alpine3.13
 
 RUN set -eux \
-  ; pip3 install --quiet --no-cache-dir --disable-pip-version-check \
-        pymongo==3.10.1 \
-        dnspython==1.16.0
+  ; mkdir -p /tmp/pip \
+  ; pip3 install --quiet --cache-dir /tmp/pip --disable-pip-version-check \
+        pymongo==3.12.0 \
+        dnspython==2.1.0 \
+  ; rm -rf /tmp/pip
 
 COPY mongo_proxy_to_primary.py /opt/mongo_proxy_to_primary.py
