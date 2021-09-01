@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.3] - 2021-09-01
+
+### Added
+
+- Docker entrypoint
+
+### Changed
+
+- python version in Dockerfile updated to 3.8.12
+- alpine version in Dockerfile updated to 3.13
+- pymongo version in Dockerfile updated to 3.12.1
+- dnspython version in Dockerfile updated to 2.1.0
+
 ## [0.0.2] - 2020-05-18
 
 ### Added
@@ -15,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reading addresses and ports from SRV records
 
 ### Changed
+
 - python version in Dockerfile updated to 3.8.3
 - alpine version in Dockerfile updated to 3.11
 - pymongo version in Dockerfile updated to 3.10.1
@@ -23,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release
 
-[unreleased]: https://github.com/agisoft-cloud/mongo-proxy-to-primary/compare/v0.0.2...HEAD
+[unreleased]: https://github.com/agisoft-cloud/mongo-proxy-to-primary/compare/v0.0.3...HEAD
+[0.0.3]: https://github.com/agisoft-cloud/mongo-proxy-to-primary/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/agisoft-cloud/mongo-proxy-to-primary/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/agisoft-cloud/mongo-proxy-to-primary/releases/tag/v0.0.1
