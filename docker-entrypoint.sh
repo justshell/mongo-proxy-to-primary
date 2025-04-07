@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ $# -gt 0 ]; then
-    if [ "$1" = "-p" ] || [ "$1" = "-n" ]; then
+    if [ "$1" = "-p" ] || [ "$1" = "-n" ] || [ "$1" = "-c" ]; then
         exec python3 /opt/mongo_proxy_to_primary.py "$@"
     else
         exec "$@"

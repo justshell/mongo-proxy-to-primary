@@ -19,34 +19,44 @@ class ParserWithHelp(argparse.ArgumentParser):
 
 
 class MongoServers:
-    def __init__(self, mongo_domain_name):
-        self.mongo_domain_name = mongo_domain_name
+    def __init__(self, connect_variable, variable_type):
+        self.connect_variable = connect_variable
+        self.variable_type = variable_type
 
     def get(self):
-        mongo_servers_list = []
+        if self.variable_type == 'dns':
+            mongo_servers_list = []
+            try:
+                get_srv_records = dns.resolver.query('_mongodb._tcp.' + self.connect_variable, 'SRV')
 
-        try:
-            get_srv_records = dns.resolver.query('_mongodb._tcp.' + self.mongo_domain_name, 'SRV')
+                for srv in get_srv_records:
+                    mongo_server = {}
+                    mongo_server['address'] = str(srv.target).rstrip('.')
+                    mongo_server['port'] = srv.port
 
-            for srv in get_srv_records:
-                mongo_server = {}
-                mongo_server['address'] = str(srv.target).rstrip('.')
-                mongo_server['port'] = srv.port
+                    if not mongo_server['address'] or not mongo_server['port']:
+                        log.error("SRV record is incorrect")
+                        sys.exit(1)
 
-                if not mongo_server['address'] or not mongo_server['port']:
-                    log.error("SRV record is incorrect")
+                    mongo_servers_list.append(mongo_server)
+
+                if not mongo_servers_list:
+                    log.error("No mongo servers were found")
                     sys.exit(1)
-
-                mongo_servers_list.append(mongo_server)
-
-            if not mongo_servers_list:
-                log.error("No mongo servers were found")
+                else:
+                    return mongo_servers_list
+            except OSError as e:
+                log.error(e)
                 sys.exit(1)
-            else:
-                return mongo_servers_list
-        except OSError as e:
-            log.error(e)
-            sys.exit(1)
+        else:
+            mongo_servers_list = []
+            for record in self.connect_variable.split(','):
+                mongo_server={}
+                mongo_server['address']=record.split(':')[0]
+                mongo_server['port']=int(record.split(':')[1])
+                mongo_servers_list.append(mongo_server)
+            print(mongo_servers_list)
+            return mongo_servers_list
 
 
 class MongoGetPrimary:
@@ -89,7 +99,7 @@ class ProxyServerToMongo:
     input_list = []
     channel = {}
 
-    def __init__(self, host, port, delay: float, buffer_size: int, mongo_domain_name):
+    def __init__(self, host, port, delay: float, buffer_size: int, connect_variable, variable_type):
         self.host = host
         self.port = port
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -98,8 +108,9 @@ class ProxyServerToMongo:
         self.server.listen(200)
         self.delay = delay
         self.buffer_size = buffer_size
-        self.mongo_domain_name = mongo_domain_name
-        self.mongo_servers_list = MongoServers(self.mongo_domain_name)
+        self.connect_variable = connect_variable
+        self.variable_type = variable_type
+        self.mongo_servers_list = MongoServers(self.connect_variable,self.variable_type)
 
     def start_server(self):
         self.input_list.append(self.server)
@@ -170,16 +181,25 @@ if __name__ == '__main__':
 
         parser = ParserWithHelp()
         parser.add_argument('-p', dest="port", help='Port to listen on', default=9211)
-        parser.add_argument('-n', dest="domain_name", help='MongoDB cluster domain name', required=True)
+        parser.add_argument('-n', dest="domain_name", help='MongoDB cluster domain name',default='')
+        parser.add_argument('-c', dest="connection_string", help='MongoDB cluster comma-separated <HOSTNAME|IP>:<PORT>',default='')
         args = parser.parse_args()
 
         server_listen_ip = '0.0.0.0'
         server_listen_port = int(args.port)
         buffer_size = 4096
         delay = 0.0001
-        mongo_domain_name = args.domain_name
+        if args.domain_name != '':
+            connect_variable = args.domain_name
+            variable_type = 'dns'
+        elif args.connection_string != '':
+            connect_variable = args.connection_string
+            variable_type = 'hosts'
+        else:
+            log.error('Not defined domain_name|connection_string')
+            sys.exit(1)
 
-        server = ProxyServerToMongo(server_listen_ip, server_listen_port, delay, buffer_size, mongo_domain_name)
+        server = ProxyServerToMongo(server_listen_ip, server_listen_port, delay, buffer_size, connect_variable, variable_type)
 
         try:
             log.info("Starting server...")
